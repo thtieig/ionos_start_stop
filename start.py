@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ####################################################
-# >>> STOP Enterprise Cloud servers using API  <<< #
+# >>> START Enterprise Cloud servers using API <<< #
 ####################################################
 
 # loads functions from *functions.py* file
@@ -14,24 +14,15 @@ def main():
         nic_href = nic['href']
         # String manipulation to extract serverID from the NIC's URL
         server_id = nic_href[nic_href.find('servers/')+len('servers/'):nic_href.rfind('/nics')]
-        # Get the first IP of the NIC
-        nic_ip = nic['properties']['ips'][0]
-        print("Currently on {} {}" .format(server_id, nic_ip))
+        print("Currently on {}" .format(server_id))
         # Check if it's a CUBE - if so, skip and continue (no stop/start for CUBES allowed)
         if get_server_details(server_id)[2] == 'CUBE' :
-            print("This is a CUBE and it will not shutoff. Skipping...\n")
+            print("This is a CUBE and no actions can be taken on this type of server. Skipping...\n")
             continue
-        # In case is LINUX, ssh and shutdown the server, then API turn off the server
-        elif 'LINUX' in get_server_details(server_id)[1] :
-            shutdown_linux(nic_ip)
-        # In case is WINDOWS, remote shutdown the server (linux samba tool), then API turn off the server
-        elif 'WINDOWS' in get_server_details(server_id)[1] :
-            shutdown_windows(nic_ip)
+        # In is NOT a CUBE, start the server
         else:
         # In case of the OS is unknown, just API turn off the server
-            print("OS unknown - graceful shutdown not possible.")
-        shutoff_check(server_id)
-        shutoff_server(server_id)
+            startup_server(server_id)
 
 
 if __name__ == "__main__":
