@@ -19,20 +19,23 @@ def main():
         print("Currently on {} {}" .format(server_id, nic_ip))
         # Check if it's a CUBE - if so, skip and continue (no stop/start for CUBES allowed)
         if get_server_details(server_id)[2] == 'CUBE' :
-            print("This is a CUBE and it will not shutoff. Skipping...\n")
+            print("This is a CUBE and it will not shutoff.\nSkipping...\n")
             continue
-        # In case is LINUX, ssh and shutdown the server, then API turn off the server
-        elif 'LINUX' in get_server_details(server_id)[1] :
-            shutdown_linux(nic_ip)
-        # In case is WINDOWS, remote shutdown the server (linux samba tool), then API turn off the server
-        elif 'WINDOWS' in get_server_details(server_id)[1] :
-            shutdown_windows(nic_ip)
+        # Check if the server is in ACTIVE status (API ON)
+        if check_server_state(server_id) == "AVAILABLE" :
+            # In case is LINUX, ssh and shutdown the server, then API turn off the server
+            if 'LINUX' in get_server_details(server_id)[1] :
+                shutdown_linux(nic_ip)
+            # In case is WINDOWS, remote shutdown the server (linux samba tool), then API turn off the server
+            elif 'WINDOWS' in get_server_details(server_id)[1] :
+                shutdown_windows(nic_ip)
+            else:
+            # In case of the OS is unknown, just API turn off the server
+                print("OS unknown - graceful shutdown not possible.\n")
+            shutoff_check(server_id)
+            shutoff_server(server_id)
         else:
-        # In case of the OS is unknown, just API turn off the server
-            print("OS unknown - graceful shutdown not possible.")
-        shutoff_check(server_id)
-        shutoff_server(server_id)
-
+            print ("Unable to STOP Server {}.\nAlready off?\nManual check required.\n".format(server_id))
 
 if __name__ == "__main__":
     main()

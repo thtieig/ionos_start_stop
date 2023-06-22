@@ -17,13 +17,16 @@ def main():
         print("Currently on {}" .format(server_id))
         # Check if it's a CUBE - if so, skip and continue (no stop/start for CUBES allowed)
         if get_server_details(server_id)[2] == 'CUBE' :
-            print("This is a CUBE and no actions can be taken on this type of server. Skipping...\n")
+            print("This is a CUBE and no actions can be taken on this type of server.\nSkipping...\n")
             continue
         # In is NOT a CUBE, start the server
         else:
-        # In case of the OS is unknown, just API turn off the server
-            startup_server(server_id)
-
+            # Check if the server is already OFF (INACTIVE)
+            if check_server_state(server_id) == "INACTIVE" :
+                # In case of the OS is unknown, just API turn off the server
+                startup_server(server_id)
+            else:
+                print ("No actions taken on server {}.\nProbably already ON?\nManual check required.\n".format(server_id))
 
 if __name__ == "__main__":
     main()
