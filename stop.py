@@ -32,7 +32,9 @@ def main():
             else:
             # In case of the OS is unknown, just API turn off the server
                 print("OS unknown - graceful shutdown not possible.\n")
+            print ("DEBUG enter shutoff_check")
             shutoff_check(server_id)
+            print ("DEBUG enter shutoff_server")
             shutoff_server(server_id)
         else:
             print ("Unable to STOP Server {}.\nAlready off?\nManual check required.\n".format(server_id))

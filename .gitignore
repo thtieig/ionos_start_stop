@@ -6,6 +6,7 @@
 # Start/stop scripts
 token
 variables.py
+test*
 
 # Node artifact files
 node_modules/

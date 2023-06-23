@@ -12,7 +12,14 @@ with open('token', 'r') as file:
     token = file.read().rstrip()
 
 authheader = {'Content-Type':'application/json','Authorization': 'Bearer {}'.format(token)}
-waitseconds = 10
+
+# timeout variables for shutoff_check [seconds]
+timeout_start = time.time()
+timeout = 30
+waitseconds = 2
+#timeout = 300
+#waitseconds = 10
+
 #######################################################################################################################################
 def nics_on_lan():
     payloadurl = "https://api.ionos.com/cloudapi/v6/datacenters/{}/lans/{}/nics?depth=1".format(dcuuid, lanid)
@@ -42,11 +49,16 @@ def check_server_state(serveruuid):
         return "UNKNOWN"
 
 def shutoff_check(serveruuid):
-    while get_server_details(serveruuid)[0] != 'SHUTOFF':
-        time.sleep(waitseconds)
-        os = get_server_details(serveruuid)[1]
-        print("{} Server {} is not off yet: checking again in {} seconds...".format(os, serveruuid, waitseconds))
-    print("{} Server {} is safely SHUTOFF".format(os, serveruuid))
+    os = get_server_details(serveruuid)[1]
+    while time.time() < timeout_start + timeout:
+        print (get_server_details(serveruuid)[0])
+        if get_server_details(serveruuid)[0] != 'SHUTOFF':
+            time.sleep(waitseconds)
+            print("{} Server {} is not off yet: checking again in {} seconds...".format(os, serveruuid, waitseconds))
+        else:
+            print("{} Server {} is safely SHUTOFF".format(os, serveruuid))
+            break
+    print ("Check timed out - waited {} seconds".format(timeout))
 
 def shutdown_linux(privateip):
     command = "ssh -q -o ConnectTimeout=10 -o LogLevel=error -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {}@{} \'shutdown -h now\' 2>&1".format(linuxadmin, privateip)
