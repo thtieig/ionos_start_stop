@@ -56,7 +56,7 @@ def shutdown_linux(privateip):
     print("Issued shutdown command to {}".format(privateip), result.stdout, result.stderr, result.returncode)
 
 def shutdown_windows(privateip):
-    command = "net rpc shutdown -f -t -0 -C 'testing shutdown' -U \"{}\"%\"{}\" -I {}".format(windowsadmin, windowspass, privateip)
+    command = "net rpc shutdown -f -t -0 -C 'testing shutdown' -U \'{}\'%\'{}\' -I {}".format(windowsadmin, windowspass, privateip)
     result = subprocess.run([command],
                             text=True,
                             shell=True)
